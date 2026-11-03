@@ -1,0 +1,47 @@
+name: Editais de fomento abertos
+
+on:
+  schedule:
+    - cron: "0 11 * * 1-5"   # seg–sex, 08h no horário de Brasília
+  workflow_dispatch:          # botão "Run workflow" para rodar na hora
+
+permissions:
+  contents: write
+
+concurrency:
+  group: editais
+  cancel-in-progress: false
+
+jobs:
+  coletar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Coletar editais
+        run: python scripts/coletar_editais.py
+
+      - name: Mostrar tabela no resumo da execução
+        if: always()
+        run: |
+          if [ -f EDITAIS_ABERTOS.md ]; then cat EDITAIS_ABERTOS.md >> "$GITHUB_STEP_SUMMARY"; fi
+
+      - name: Salvar resultado no repositório
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add EDITAIS_ABERTOS.md data/
+          if git diff --cached --quiet; then
+            echo "Sem mudanças."
+          else
+            git commit -m "chore: atualiza editais abertos"
+            git push
+          fi
