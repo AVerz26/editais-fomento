@@ -55,6 +55,21 @@
   },
   {
     "agencia": "FAPESP",
+    "titulo": "Bolsa de PD em Bioquímica Instituição: Centro de Ciências e Tecnologias para a Sustentabilidade, Universidade Federal de São Carlos (CCTS-UFSCar) Cidade: Sorocaba Inscrições até: 20/11/2026 O projeto envolve o isolamento e identificação de luciferinas, análises estruturais de compostos naturais, além do uso de ferramentas de química orgânica para elucidação funcional dos sistemas luminescentes. Técnicas como purificação de compostos por cromatografia em coluna e HPLC, ensaios enzimáticos, síntese orgânica básica, espectroscopia...",
+    "url": "https://fapesp.br/oportunidades/bioluminescencia-biodiversidade-origem-metabolica-estrutura-funcao-e-engenharia-de-luciferases-empregos-em-biossensores-bioensaios-e-bioindicacao-ambiental/9992/",
+    "ambito": "Estadual (SP)",
+    "prazo": "2026-11-20",
+    "prazo_texto": "",
+    "valor_bolsa": "",
+    "setores": [
+      "Ciências Exatas e da Terra",
+      "Meio ambiente / Clima",
+      "Engenharias / Tecnologia"
+    ],
+    "tem_bolsa": true
+  },
+  {
+    "agencia": "FAPESP",
     "titulo": "Bolsa de Mestrado em Biologia Molecular Instituição: Escola de Engenharia de Lorena, Universidade de São Paulo (EEL-USP) Cidade: Lorena Inscrições até: 21/11/2026 O bolsista realizará triagem e seleção de linhagens recombinantes de microalgas, produção de proteínas em pequena escala, ensaios de atividade enzimática e caracterização cinética preliminar. O trabalho será desenvolvido no JUST Lab, EEL-USP, em Lorena/SP, no âmbito do Auxílio Jovem Pesquisador FAPESP 2025/09133-0, apoiando o...",
     "url": "https://fapesp.br/oportunidades/plataforma-de-desenvolvimento-de-biofarmaco-em-microalgas-creglicerase/9957/",
     "ambito": "Estadual (SP)",
@@ -225,7 +240,7 @@
   },
   {
     "agencia": "CONFAP",
-    "titulo": "Ver detalhes",
+    "titulo": "Editais",
     "url": "https://confap.org.br/pt/editais/117/chamada-transnacional-conjunta-biodiversa-biodivfuture-2026-2027",
     "ambito": "Nacional",
     "prazo": "2027-04-16",
@@ -238,7 +253,7 @@
   },
   {
     "agencia": "CONFAP",
-    "titulo": "Ver detalhes",
+    "titulo": "Editais",
     "url": "https://confap.org.br/pt/editais/119/chamada-transnacional-conjunta-forest-2026",
     "ambito": "Nacional",
     "prazo": "2027-06-02",
