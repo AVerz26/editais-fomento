@@ -68,6 +68,10 @@ class Edital:
     valor_bolsa: str = ""
     setores: list[str] = field(default_factory=list)
     tem_bolsa: bool = False
+    resumo: str = ""
+    modalidades: list[str] = field(default_factory=list)
+    pdfs: list[str] = field(default_factory=list)
+    coletado_em: str = ""
 
 
 def get(url: str, **kw) -> requests.Response:
@@ -146,12 +150,12 @@ def achar_prazo(texto: str) -> date | None:
 def achar_valores(texto: str) -> str:
     """Valores mensais de bolsa (R$) citados perto de 'bolsa'; ignora orçamentos totais."""
     achados: list[str] = []
-    for m in re.finditer(r"R\$\s?([\d.]+)(?:,(\d{2}))?", texto):
+    for m in re.finditer(r"R\$\s?([\d.]+)(?:,(\d{2}))?", texto, re.I):
         valor = float(m.group(1).replace(".", "") + "." + (m.group(2) or "00"))
         if not 300 <= valor <= 12000:
             continue
         janela = texto[max(0, m.start() - 100): m.end() + 100].lower()
-        if "bolsa" in janela and not re.search(r"or[çc]amento|recursos? (?:total|financeiro)|global|investimento", janela):
+        if "bolsa" in janela and not re.search(r"or[çc]amento|recursos? (?:total|financeiro)|global|investimento|contrapartida|taxa de", janela):
             v = f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
             if v not in achados:
                 achados.append(v)
@@ -182,15 +186,60 @@ def texto_pdf(url: str) -> str:
         return ""
 
 
+MODALIDADES = {
+    "Iniciação Científica": r"inicia[çc][ãa]ocient[íi]fica|inicia[çc][ãa]o cient[íi]fica|pibic|pibiti",
+    "Iniciação Tecnológica": r"inicia[çc][ãa]otecnol|inicia[çc][ãa]o tecnol",
+    "Graduação": r"gradua[çc][ãa]o|licenciatura",
+    "Mestrado": r"mestrado",
+    "Doutorado": r"doutorado(?!-?sandu)|doutoradodireto",
+    "Doutorado-sanduíche": r"sandu[íi]che",
+    "Pós-doutorado": r"p[óo]s-?doutor",
+    "Produtividade em pesquisa": r"produtividade",
+    "Desenvolvimento Tecnológico": r"desenvolvimentotecnol|desenvolvimento tecnol|dti",
+    "Extensão": r"extens[ãa]o",
+}
+LIXO_RESUMO = re.compile(
+    r"Compartilhe.*?transfer[êe]ncia|Publicado em\s*[\d/ hH:]+Atualizado em\s*[\d/ hH:]+|"
+    r"Compartilhe por \w+",
+    re.I,
+)
+
+
+def letras_espacadas(t: str) -> bool:
+    """PDFs que extraem 'P r o g r a m a' (uma letra por token)."""
+    toks = t.split()
+    return len(toks) > 80 and sum(len(x) == 1 for x in toks) / len(toks) > 0.5
+
+
+def fazer_resumo(texto: str, limite: int = 650) -> str:
+    t = clean(LIXO_RESUMO.sub(" ", texto))
+    if len(t) <= limite:
+        return t
+    corte = t[:limite]
+    ponto = max(corte.rfind(". "), corte.rfind("; "))
+    return (corte[: ponto + 1] if ponto > 250 else corte.rstrip()) + ("" if ponto > 250 else "…")
+
+
 def completar(ed: Edital, texto_pagina: str, pdfs: list[str]) -> None:
-    """Preenche setores / valor / bolsa lendo a página e, se preciso, os PDFs."""
-    texto = texto_pagina
+    """Preenche setores / valor / bolsa / modalidades lendo a página e, se preciso, os PDFs."""
+    texto = clean(texto_pagina)
+    colados: list[str] = []  # PDFs sem separação de palavras: busca sem 
     for u in pdfs[:2]:
-        texto += " " + texto_pdf(u)
-    texto = clean(texto)
-    ed.tem_bolsa = bool(re.search(r"\bbolsas?\b", texto, re.I))
-    ed.valor_bolsa = achar_valores(texto) or ""
+        t = texto_pdf(u)
+        if letras_espacadas(t):
+            colados.append(re.sub(r"\s+", "", t).lower())
+        else:
+            texto += " " + clean(t)
+    ed.pdfs = pdfs[:3]
+    ed.tem_bolsa = bool(re.search(r"bolsas?", texto, re.I)) or any(re.search(r"(?<!em)bolsa(?!r)", c) for c in colados)
+    valores = [v for v in (achar_valores(texto), *(achar_valores(c) for c in colados)) if v]
+    ed.valor_bolsa = "; ".join(dict.fromkeys("; ".join(valores).split("; ")))[:200] if valores else ""
     ed.setores = achar_setores(ed.titulo + " " + texto_pagina[:2500])
+    base = (ed.titulo + " " + texto[:6000]).lower()
+    ed.modalidades = [n for n, rx in MODALIDADES.items()
+                      if re.search(rx, base) or any(re.search(rx, c[:15000]) for c in colados)]
+    ed.resumo = fazer_resumo(texto_pagina)
+    ed.coletado_em = HOJE.isoformat()
     if ed.prazo is None:
         ed.prazo = achar_prazo(texto)
 

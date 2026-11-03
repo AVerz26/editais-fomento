@@ -9,6 +9,16 @@ Coleta automática (GitHub Actions) de editais abertos com bolsas: CNPq, CAPES, 
 - `scripts/coletar_editais.py` lê as páginas de editais, abre cada edital (e o PDF), mantém só os que citam **bolsa** e têm **prazo futuro**.
 - O resultado é gravado de volta no repositório e aparece no resumo de cada execução.
 
+## Painel (Streamlit)
+`app.py` mostra cada edital em detalhe (valor, modalidades, setores, resumo, links e PDFs), com filtros e tabela exportável.
+
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+Para publicar: [share.streamlit.io](https://share.streamlit.io) → *New app* → repositório `AVerz26/editais-fomento`, branch `main`, arquivo `app.py`. O painel lê `data/editais.json`, que o workflow atualiza sozinho.
+
 ## Configuração única
 Settings → Actions → General → Workflow permissions → **Read and write permissions**.
 
