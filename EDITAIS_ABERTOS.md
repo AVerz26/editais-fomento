@@ -1,6 +1,6 @@
 # Editais de fomento com bolsas abertos
 
-Atualizado em **10/11/2026 15:34 (Brasília)** · 0 edital(is) com bolsa e prazo em aberto · Nacional / geral: 0 · Mato Grosso: 0 · Outros estados: 0
+Atualizado em **11/11/2026 15:23 (Brasília)** · 0 edital(is) com bolsa e prazo em aberto · Nacional / geral: 0 · Mato Grosso: 0 · Outros estados: 0
 
 ## Nacional / geral (0)
 
